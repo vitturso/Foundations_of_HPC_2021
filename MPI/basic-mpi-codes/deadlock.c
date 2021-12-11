@@ -38,8 +38,8 @@ int main(int argc, char *argv[])
       iretag = ITAG_A;
     }
 
-  printf("Task %d sends the message with tag %d of length %d \n", irank,istag,MSGLEN*sizeof(float));
-  printf("Task %d receives message with tag %d of length %d \n", irank, iretag,MSGLEN*sizeof(float));
+  printf("Task %d sends the message with tag %d of length %ld \n", irank,istag,MSGLEN*sizeof(float));
+  printf("Task %d receives message with tag %d of length %ld \n", irank, iretag,MSGLEN*sizeof(float));
   MPI_Barrier(MPI_COMM_WORLD);
 
   MPI_Send(&rmsg1, MSGLEN, MPI_FLOAT, idest, istag, MPI_COMM_WORLD); 
