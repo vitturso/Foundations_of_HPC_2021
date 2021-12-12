@@ -111,7 +111,7 @@ int main (int argc, char ** argv) {
   int n;
   float *vett;
   FILE *fd;
-  int t,q;
+  int t;
   int d=0;
   float r;
   
@@ -147,23 +147,23 @@ int main (int argc, char ** argv) {
     int myid = omp_get_thread_num();
   // float *rvett;
   // rvett=malloc(sizeof(float)*3*n/nthreads);
-     rhot=calloc(sizeof(float),N*N*N); 
-    #pragma omp for 
+ //    rhot=calloc(sizeof(float),N*N*N); 
+   #pragma omp for 
     for(t=0; t<(3*n); t++)
 //{    
       printf("[%d]received value = %f \n", myid, vett[t]);
-   #pragma omp for 
+  
    for(t=0; t < (3*n); t++)
-  {   
-    if (t>0 && (t+1)%3==0)
-      { 
+  {    
+   if (t>0 &&  (t+1)%3==0)
+   { 
       //   printf("\n");
          float * p= &vett[t-2];
-
-         for (q=0; q< 3*N*N*N; q=q+3)
+   //   #pragma omp for reduction(+:r)
+         for (int q=0; q<3*N*N*N; q=q+3)
          {
            r=(pow(grid[q+0]-p[0],2))+(pow(grid[q+1]-p[1],2))+(pow(grid[q+2]-p[2],2));
-           printf("%f \n", r);
+           printf("%f on [%d]\n", r, myid);
            if (r< R*R)
            {
            printf(" in \n ");
@@ -173,8 +173,8 @@ int main (int argc, char ** argv) {
            }  
          }
        }
-   //}
-   }
+  }
+ //  }
   }
  //  rhot[d-1]=rho[d-1]-rhot[d-1];
  
