@@ -46,9 +46,7 @@ int main (int argc, char ** argv) {
  // faccio la grid
    int           nthreads=0;
   
-   #pragma omp parallel  
-   #pragma omp master
-    nthreads = omp_get_num_threads();
+  
  int node;
  float radius; 
  node=atoi(argv[1]);
@@ -67,7 +65,7 @@ int main (int argc, char ** argv) {
  //for(N=1; N<=2;N++)
 // {
  N=node;
-  printf("omp calculation with %d threads\nN=%f\n",nthreads ,N);
+ 
  grid=malloc(sizeof(float)*3*N*N*N);
  printf("the number of grid node points is %f \n",N*N*N);
  //R=1/(2*N);
@@ -140,26 +138,32 @@ int main (int argc, char ** argv) {
      printf("\n");
      
    }  
+   #pragma omp parallel  
+   {
+     int myid = omp_get_thread_num();
+   #pragma omp master
+    nthreads = omp_get_num_threads();
+//   float *rhot;
+    printf("omp calculation with %d threads\nN=%f\n",nthreads ,N);
+
   
-   float *rhot;
- #pragma omp parallel
- {
-    int myid = omp_get_thread_num();
   // float *rvett;
   // rvett=malloc(sizeof(float)*3*n/nthreads);
  //    rhot=calloc(sizeof(float),N*N*N); 
-   #pragma omp for 
+   #pragma omp for ordered  
     for(t=0; t<(3*n); t++)
-//{    
+//{  
+  #pragma omp  ordered 
       printf("[%d]received value = %f \n", myid, vett[t]);
-  
+  #pragma omp for ordered
+  //{
    for(t=0; t < (3*n); t++)
-  {    
+   {    
    if (t>0 &&  (t+1)%3==0)
    { 
       //   printf("\n");
          float * p= &vett[t-2];
-   //   #pragma omp for reduction(+:r)
+    //  #pragma omp for reduction(+:rho)
          for (int q=0; q<3*N*N*N; q=q+3)
          {
            r=(pow(grid[q+0]-p[0],2))+(pow(grid[q+1]-p[1],2))+(pow(grid[q+2]-p[2],2));
@@ -173,8 +177,10 @@ int main (int argc, char ** argv) {
            }  
          }
        }
-  }
+   }
  //  }
+  
+ // }
   }
  //  rhot[d-1]=rho[d-1]-rhot[d-1];
  
